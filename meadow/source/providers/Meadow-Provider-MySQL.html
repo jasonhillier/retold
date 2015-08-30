@@ -1,0 +1,202 @@
+<!DOCTYPE html><html lang="en"><head><title>source/providers/Meadow-Provider-MySQL</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="source/providers/Meadow-Provider-MySQL"><meta name="groc-project-path" content="source/providers/Meadow-Provider-MySQL.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">source/providers/Meadow-Provider-MySQL.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> license MIT and author <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#115;&#x74;&#101;&#118;&#x65;&#x6e;&#64;&#x76;&#101;&#108;&#x6f;&#122;&#111;&#x2e;&#x63;&#111;&#109;">&#115;&#x74;&#101;&#118;&#x65;&#x6e;&#64;&#x76;&#101;&#108;&#x6f;&#122;&#111;&#x2e;&#x63;&#111;&#109;</a></span></p>
+<h5 id="part-of-the-retold-https-stevenvelozo-github-io-retold-system">Part of the <strong><a href="https://stevenvelozo.github.io/retold/">retold</a></strong> system</h5></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> libMySQL = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mysql2'</span>);
+
+<span class="hljs-keyword">var</span> MeadowProvider = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createNew</span>(<span class="hljs-params">pFable</span>)
+	</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If a valid Fable object isn&#39;t passed in, return a constructor</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span>(pFable) !== <span class="hljs-string">'object'</span>)
+		{
+			<span class="hljs-keyword">return</span> {<span class="hljs-keyword">new</span>: createNew};
+		}
+		<span class="hljs-keyword">var</span> _Fable = pFable;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Build a connection pool, shared within this provider.
+This may be more performant as a shared object.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> getSQLConnection = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+		</span>{
+			<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span>(_Fable.MeadowMySQLConnectionPool) !== <span class="hljs-string">'object'</span>)
+			{
+				_Fable.MeadowMySQLConnectionPool = libMySQL.createPool
+				(
+					{
+						connectionLimit: _Fable.settings.MySQL.ConnectionPoolLimit,
+						host: _Fable.settings.MySQL.Server,
+						port: _Fable.settings.MySQL.Port,
+						user: _Fable.settings.MySQL.User,
+						password: _Fable.settings.MySQL.Password,
+						database: _Fable.settings.MySQL.Database,
+						namedPlaceholders: <span class="hljs-literal">true</span>
+					}
+				);
+			}
+			<span class="hljs-keyword">return</span> _Fable.MeadowMySQLConnectionPool;
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The Meadow marshaller also passes in the Schema as the third parameter, but this is a blunt function ATM.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> marshalRecordFromSourceToObject = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pObject, pRecord</span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>For now, crudely assign everything in pRecord to pObject
+This is safe in this context, and we don&#39;t want to slow down marshalling with millions of hasOwnProperty checks</p></div></div><div class="code"><div class="wrapper">			<span class="hljs-comment">/*jshint -W089 */</span>
+			<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> tmpColumn <span class="hljs-keyword">in</span> pRecord)
+			{
+				pObject[tmpColumn] = pRecord[tmpColumn];
+			}
+			<span class="hljs-comment">/*jshint +W089 */</span>
+		};
+
+		<span class="hljs-keyword">var</span> Create = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{
+			<span class="hljs-keyword">var</span> tmpResult = pQuery.parameters.result;
+
+			pQuery.setDialect(<span class="hljs-string">'MySQL'</span>).buildCreateQuery();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO: Test the query before executing</p></div></div><div class="code"><div class="wrapper">			<span class="hljs-keyword">if</span> (pQuery.logLevel &gt; <span class="hljs-number">0</span>)
+			{
+				_Fable.log.trace(pQuery.query.body, pQuery.query.parameters);
+			}
+
+			getSQLConnection().query
+			(
+				pQuery.query.body,
+				pQuery.query.parameters,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The MySQL library also returns the Fields as the third parameter</p></div></div><div class="code"><div class="wrapper">				<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pError, pRows</span>)
+				</span>{
+					tmpResult.error = pError;
+					tmpResult.value = <span class="hljs-literal">false</span>;
+					<span class="hljs-keyword">try</span>
+					{
+						tmpResult.value = pRows.insertId;
+					}
+					<span class="hljs-keyword">catch</span>(pErrorGettingRowcount)
+					{
+						_Fable.log.warn(<span class="hljs-string">'Error getting insert ID during create query'</span>,{Body:pQuery.query.body, Parameters:pQuery.query.parameters});
+					}
+
+					tmpResult.executed = <span class="hljs-literal">true</span>;
+					fCallback();
+				}
+			);
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This is a synchronous read, good for a few records.
+TODO: Add a pipe-able read for huge sets</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> Read = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{
+			<span class="hljs-keyword">var</span> tmpResult = pQuery.parameters.result;
+
+			pQuery.setDialect(<span class="hljs-string">'MySQL'</span>).buildReadQuery();
+
+			<span class="hljs-keyword">if</span> (pQuery.logLevel &gt; <span class="hljs-number">0</span>)
+			{
+				_Fable.log.trace(pQuery.query.body, pQuery.query.parameters);
+			}
+
+			getSQLConnection().query
+			(
+				pQuery.query.body,
+				pQuery.query.parameters,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The MySQL library also returns the Fields as the third parameter</p></div></div><div class="code"><div class="wrapper">				<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pError, pRows</span>)
+				</span>{
+					tmpResult.error = pError;
+					tmpResult.value = pRows;
+					tmpResult.executed = <span class="hljs-literal">true</span>;
+					fCallback();
+				}
+			);
+		};
+
+		<span class="hljs-keyword">var</span> Update = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{
+			<span class="hljs-keyword">var</span> tmpResult = pQuery.parameters.result;
+
+			pQuery.setDialect(<span class="hljs-string">'MySQL'</span>).buildUpdateQuery();
+
+			<span class="hljs-keyword">if</span> (pQuery.logLevel &gt; <span class="hljs-number">0</span>)
+			{
+				_Fable.log.trace(pQuery.query.body, pQuery.query.parameters);
+			}
+
+			getSQLConnection().query
+			(
+				pQuery.query.body,
+				pQuery.query.parameters,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The MySQL library also returns the Fields as the third parameter</p></div></div><div class="code"><div class="wrapper">				<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pError, pRows</span>)
+				</span>{
+					tmpResult.error = pError;
+					tmpResult.value = pRows;
+					tmpResult.executed = <span class="hljs-literal">true</span>;
+					fCallback();
+				}
+			);
+		};
+
+		<span class="hljs-keyword">var</span> Delete = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{
+			<span class="hljs-keyword">var</span> tmpResult = pQuery.parameters.result;
+
+			pQuery.setDialect(<span class="hljs-string">'MySQL'</span>).buildDeleteQuery();
+
+			<span class="hljs-keyword">if</span> (pQuery.logLevel &gt; <span class="hljs-number">0</span>)
+			{
+				_Fable.log.trace(pQuery.query.body, pQuery.query.parameters);
+			}
+
+			getSQLConnection().query
+			(
+				pQuery.query.body,
+				pQuery.query.parameters,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The MySQL library also returns the Fields as the third parameter</p></div></div><div class="code"><div class="wrapper">				<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pError, pRows</span>)
+				</span>{
+					tmpResult.error = pError;
+					tmpResult.value = <span class="hljs-literal">false</span>;
+					<span class="hljs-keyword">try</span>
+					{
+						tmpResult.value = pRows.affectedRows;
+					}
+					<span class="hljs-keyword">catch</span>(pErrorGettingRowcount)
+					{
+						_Fable.log.warn(<span class="hljs-string">'Error getting affected rowcount during delete query'</span>,{Body:pQuery.query.body, Parameters:pQuery.query.parameters});
+					}
+					tmpResult.executed = <span class="hljs-literal">true</span>;
+					fCallback();
+				}
+			);
+		};
+
+		<span class="hljs-keyword">var</span> Count = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{
+			<span class="hljs-keyword">var</span> tmpResult = pQuery.parameters.result;
+
+			pQuery.setDialect(<span class="hljs-string">'MySQL'</span>).buildCountQuery();
+
+			<span class="hljs-keyword">if</span> (pQuery.logLevel &gt; <span class="hljs-number">0</span>)
+			{
+				_Fable.log.trace(pQuery.query.body, pQuery.query.parameters);
+			}
+
+			getSQLConnection().query
+			(
+				pQuery.query.body,
+				pQuery.query.parameters,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The MySQL library also returns the Fields as the third parameter</p></div></div><div class="code"><div class="wrapper">				<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pError, pRows</span>)
+				</span>{
+					tmpResult.executed = <span class="hljs-literal">true</span>;
+					tmpResult.error = pError;
+					tmpResult.value = <span class="hljs-literal">false</span>;
+					<span class="hljs-keyword">try</span>
+					{
+						tmpResult.value = pRows[<span class="hljs-number">0</span>].RowCount;
+					}
+					<span class="hljs-keyword">catch</span>(pErrorGettingRowcount)
+					{
+						_Fable.log.warn(<span class="hljs-string">'Error getting rowcount during count query'</span>,{Body:pQuery.query.body, Parameters:pQuery.query.parameters});
+					}
+					fCallback();
+				}
+			);
+		};
+
+		<span class="hljs-keyword">var</span> tmpNewProvider = (
+		{
+			marshalRecordFromSourceToObject: marshalRecordFromSourceToObject,
+
+			Create: Create,
+			Read: Read,
+			Update: Update,
+			Delete: Delete,
+			Count: Count,
+
+			<span class="hljs-keyword">new</span>: createNew
+		});
+
+
+		<span class="hljs-keyword">return</span> tmpNewProvider;
+	}
+
+	<span class="hljs-keyword">return</span> createNew();
+};
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> MeadowProvider();</div></div></div></div></body></html>

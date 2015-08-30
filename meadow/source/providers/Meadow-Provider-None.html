@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="en"><head><title>source/providers/Meadow-Provider-None</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="source/providers/Meadow-Provider-None"><meta name="groc-project-path" content="source/providers/Meadow-Provider-None.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">source/providers/Meadow-Provider-None.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> license MIT and author <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x73;&#116;&#101;&#118;&#101;&#x6e;&#x40;&#x76;&#x65;&#108;&#x6f;&#x7a;&#x6f;&#46;&#x63;&#111;&#x6d;">&#x73;&#116;&#101;&#118;&#101;&#x6e;&#x40;&#x76;&#x65;&#108;&#x6f;&#x7a;&#x6f;&#46;&#x63;&#111;&#x6d;</a></span></p>
+<h5 id="part-of-the-retold-https-stevenvelozo-github-io-retold-system">Part of the <strong><a href="https://stevenvelozo.github.io/retold/">retold</a></strong> system</h5></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> MeadowProvider = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createNew</span>(<span class="hljs-params">pFable</span>)
+	</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If a valid Fable object isn&#39;t passed in, return a constructor</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">typeof</span>(pFable) !== <span class="hljs-string">'object'</span>) || (!pFable.hasOwnProperty(<span class="hljs-string">'fable'</span>)))
+		{
+			<span class="hljs-keyword">return</span> {<span class="hljs-keyword">new</span>: createNew};
+		}
+		<span class="hljs-comment">//var _Fable = pFable;</span>
+
+		<span class="hljs-comment">//var marshalRecordFromSourceToObject = function(pObject, pRecord, pSchema)</span>
+		<span class="hljs-keyword">var</span> marshalRecordFromSourceToObject = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Do nothing ... this is the NONE provider after all</p></div></div><div class="code"><div class="wrapper">		};
+
+		<span class="hljs-keyword">var</span> Create = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This does nothing because it&#39;s the none data provider!</p></div></div><div class="code"><div class="wrapper">			pQuery.parameters.result.executed = <span class="hljs-literal">true</span>;
+			fCallback();
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This is a synchronous read, good for a few records.
+TODO: Add a pipe-able read for huge sets</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> Read = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This does nothing because it&#39;s the none data provider!</p></div></div><div class="code"><div class="wrapper">			pQuery.parameters.result.executed = <span class="hljs-literal">true</span>;
+			pQuery.parameters.result.value = [<span class="hljs-literal">true</span>];
+			fCallback();
+		};
+
+		<span class="hljs-keyword">var</span> Update = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This does nothing because it&#39;s the none data provider!</p></div></div><div class="code"><div class="wrapper">			pQuery.parameters.result.executed = <span class="hljs-literal">true</span>;
+			fCallback();
+		};
+
+		<span class="hljs-keyword">var</span> Delete = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This does nothing because it&#39;s the none data provider!</p></div></div><div class="code"><div class="wrapper">			pQuery.parameters.result.executed = <span class="hljs-literal">true</span>;
+			fCallback();
+		};
+
+		<span class="hljs-keyword">var</span> Count = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallback</span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This does nothing because it&#39;s the none data provider!</p></div></div><div class="code"><div class="wrapper">			pQuery.parameters.result.executed = <span class="hljs-literal">true</span>;
+			fCallback();
+		};
+
+		<span class="hljs-keyword">var</span> tmpNewProvider = (
+		{
+			marshalRecordFromSourceToObject: marshalRecordFromSourceToObject,
+
+			Create: Create,
+			Read: Read,
+			Update: Update,
+			Delete: Delete,
+			Count: Count,
+
+			<span class="hljs-keyword">new</span>: createNew
+		});
+
+
+		<span class="hljs-keyword">return</span> tmpNewProvider;
+	}
+
+	<span class="hljs-keyword">return</span> createNew();
+};
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> MeadowProvider();</div></div></div></div></body></html>

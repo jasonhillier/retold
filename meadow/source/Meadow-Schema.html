@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="en"><head><title>source/Meadow-Schema</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="source/Meadow-Schema"><meta name="groc-project-path" content="source/Meadow-Schema.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">source/Meadow-Schema.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> license MIT and author <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#58;&#115;&#116;&#x65;&#x76;&#x65;&#x6e;&#x40;&#x76;&#101;&#x6c;&#x6f;&#x7a;&#x6f;&#x2e;&#99;&#x6f;&#109;">&#115;&#116;&#x65;&#x76;&#x65;&#x6e;&#x40;&#x76;&#101;&#x6c;&#x6f;&#x7a;&#x6f;&#x2e;&#99;&#x6f;&#109;</a></span></p>
+<h5 id="part-of-the-retold-https-stevenvelozo-github-io-retold-system">Part of the <strong><a href="https://stevenvelozo.github.io/retold/">retold</a></strong> system</h5></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> libValidator = <span class="hljs-built_in">require</span>(<span class="hljs-string">'is-my-json-valid'</span>);</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> class MeadowSchema</span></p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> MeadowSchema = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createNew</span>(<span class="hljs-params">pOriginalJsonSchema, pOriginalSchema</span>)
+	</span>{</div></div></div><div class="segment"><div class="code folded"><div class="wrapper marker"><span class="c1">		/* An Example Meadow Schema Object</span></div><div class="wrapper">		<span class="hljs-comment">/* An Example Meadow Schema Object
+		    [
+		    	{ "Column": "IDAnimal", "Type":"AutoIdentity" },
+		    	{ "Column": "GUIDAnimal", "Type":"AutoGUID" },
+		    	{ "Column": "Created", "Type":"CreateDate" },
+		    	{ "Column": "CreatingIDUser", "Type":"CreateIDUser" },
+		    	{ "Column": "Modified", "Type":"UpdateDate" },
+		    	{ "Column": "ModifyingIDUser", "Type":"UpdateIDUser" },
+		    	{ "Column": "Deleted", "Type":"Deleted" },
+		    	{ "Column": "DeletingIDUser", "Type":"DeleteIDUser" },
+		    	{ "Column": "DeleteDate", "Type":"DeleteDate" }
+		    ]
+		*/</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h4 id="the-meadow-schema">The Meadow Schema</h4>
+<p>Meadow uses this description object to create queries, broker data and generate interfaces.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _Schema = <span class="hljs-literal">false</span>;</div></div></div><div class="segment"><div class="code folded"><div class="wrapper marker"><span class="c1">		/* An Example JSONSchema Object:</span></div><div class="wrapper">		<span class="hljs-comment">/* An Example JSONSchema Object:
+		    	{
+		    		"$schema": "http://json-schema.org/draft-04/schema#",
+		    		"title": "Product",
+		    		"description": "A product from Acme's catalog",
+		    		"type": "object",
+		    		"properties": {
+		    			"id": {
+		    				"description": "The unique identifier for a product",
+		    				"type": "integer"
+		    			},
+		    			"name": {
+		    				"description": "Name of the product",
+		    				"type": "string"
+		    			},
+		    			"price": {
+		    				"type": "number",
+		    				"minimum": 0,
+		    				"exclusiveMinimum": true
+		    			},
+		    			"tags": {
+		    				"type": "array",
+		    				"items": {
+		    					"type": "string"
+		    				},
+		    				"minItems": 1,
+		    				"uniqueItems": true
+		    			}
+		    		},
+		    		"required": ["id", "name", "price"]
+		    	}
+		*/</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h4 id="a-jsonschema-description">A JSONSchema Description</h4>
+<p><a href="http://json-schema.org/examples.html">http://json-schema.org/examples.html</a></p>
+<p><a href="http://json-schema.org/latest/json-schema-core.html">http://json-schema.org/latest/json-schema-core.html</a></p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _JsonSchema = <span class="hljs-literal">false</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h4 id="an-quotemptyquot-orm-object">An &quot;empty&quot; ORM object</h4>
+<p>This is the basis for being filled out by the marshalling code.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _Default = <span class="hljs-literal">false</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The cached validator, which uses the JSONSchema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _Validate = <span class="hljs-literal">false</span>;</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setSchema</span></p>
+<p>Set the Meadow schema</p>
+<p>Our schemas are really instructions for <em>what</em> to do <em>when</em>.  We track:</p>
+<ul>
+<li>Column</li>
+<li>Type <em>(e.g. AutoIdentity, AutoGUID, CreateDate, CreateIDUser, UpdateDate, UpdateIDUser, DeleteDate, Deleted, DeleteIDUser)</em></li>
+<li>Optionally Special Instractions</li>
+</ul></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setSchema = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pSchema</span>)
+		</span>{
+			_Schema = (<span class="hljs-keyword">typeof</span>(pSchema) === <span class="hljs-string">'object'</span>) ? pSchema : (
+			{
+				title: <span class="hljs-string">'Unknown'</span>,
+				type: <span class="hljs-string">'object'</span>,
+				required: []
+			});
+		};
+		setSchema(pOriginalSchema);</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setJsonSchema</span></p>
+<p>Set the JSONSchema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setJsonSchema = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pJsonSchema</span>)
+		</span>{
+			_JsonSchema = (<span class="hljs-keyword">typeof</span>(pJsonSchema) === <span class="hljs-string">'object'</span>) ? pJsonSchema : (
+			{
+				title: <span class="hljs-string">'Unknown'</span>,
+				type: <span class="hljs-string">'object'</span>,
+				required: []
+			});
+			_Validate = libValidator(_JsonSchema, { greedy:<span class="hljs-literal">true</span>, verbose:<span class="hljs-literal">true</span> });
+		};
+		setJsonSchema(pOriginalJsonSchema);</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setDefault</span></p>
+<p>Set the Default ORM object</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setDefault = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pDefault</span>)
+		</span>{
+			_Default = (<span class="hljs-keyword">typeof</span>(pDefault) === <span class="hljs-string">'object'</span>) ? pDefault : {};
+		};
+		setDefault();</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method validateObject</span></p>
+<p>Validate an object against the current schema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> validateObject = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pObject</span>)
+		</span>{
+			<span class="hljs-keyword">var</span> tmpValidation = { Valid:_Validate(pObject) };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Stuff the errors in if it is invalid</p></div></div><div class="code"><div class="wrapper">			<span class="hljs-keyword">if</span> (!tmpValidation.Valid)
+			{
+				tmpValidation.Errors = _Validate.errors;
+			}
+
+			<span class="hljs-keyword">return</span> tmpValidation;
+		};
+
+
+		<span class="hljs-keyword">var</span> tmpNewMeadowSchemaObject = (
+		{
+			setSchema: setSchema,
+			setJsonSchema: setJsonSchema,
+			setDefault: setDefault,
+			validateObject: validateObject,
+
+			<span class="hljs-keyword">new</span>: createNew
+		});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property schema of type <em>object</em></span></p>
+<p>The Meadow Schema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowSchemaObject, <span class="hljs-string">'schema'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _Schema; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property jsonSchema of type <em>object</em></span></p>
+<p>The JsonSchema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowSchemaObject, <span class="hljs-string">'jsonSchema'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _JsonSchema; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property defaultObject of type <em>object</em></span></p>
+<p>Default Object</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowSchemaObject, <span class="hljs-string">'defaultObject'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _Default; },
+				enumerable: <span class="hljs-literal">true</span>
+			});
+
+
+		<span class="hljs-keyword">return</span> tmpNewMeadowSchemaObject;
+	}
+
+	<span class="hljs-keyword">return</span> createNew();
+};
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> MeadowSchema();</div></div></div></div></body></html>

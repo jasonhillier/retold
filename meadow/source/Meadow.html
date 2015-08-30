@@ -1,0 +1,205 @@
+<!DOCTYPE html><html lang="en"><head><title>source/Meadow</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="source/Meadow"><meta name="groc-project-path" content="source/Meadow.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">source/Meadow.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> license MIT and author <a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#115;&#116;&#101;&#x76;&#101;&#110;&#x40;&#x76;&#101;&#108;&#x6f;&#122;&#111;&#x2e;&#x63;&#x6f;&#x6d;">&#115;&#116;&#101;&#x76;&#101;&#110;&#x40;&#x76;&#101;&#108;&#x6f;&#122;&#111;&#x2e;&#x63;&#x6f;&#x6d;</a></span></p>
+<h5 id="part-of-the-retold-https-stevenvelozo-github-io-retold-system">Part of the <strong><a href="https://stevenvelozo.github.io/retold/">retold</a></strong> system</h5></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> libUnderscore = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+<span class="hljs-keyword">var</span> libFoxHound = <span class="hljs-built_in">require</span>(<span class="hljs-string">'foxhound'</span>);</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> class Meadow</span></p>
+<p>Meadow Data Broker Library</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> Meadow = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createNew</span>(<span class="hljs-params">pFable, pScope, pJsonSchema, pSchema</span>)
+	</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If a valid Fable object isn&#39;t passed in, return a constructor</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">typeof</span>(pFable) !== <span class="hljs-string">'object'</span>) || (!pFable.hasOwnProperty(<span class="hljs-string">'fable'</span>)))
+		{
+			<span class="hljs-keyword">return</span> {<span class="hljs-keyword">new</span>: createNew};
+		}
+		<span class="hljs-keyword">var</span> _Fable = pFable;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Make sure there is a valid data broker set</p></div></div><div class="code"><div class="wrapper">		_Fable.settingsManager.fill({MeadowProvider:<span class="hljs-string">'None'</span>});
+
+		<span class="hljs-keyword">var</span> _IDUser = <span class="hljs-number">0</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The scope of this broker.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _Scope = (<span class="hljs-keyword">typeof</span>(pScope) === <span class="hljs-string">'string'</span>) ? pScope : <span class="hljs-string">'Unknown'</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The schema for this broker</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _Schema = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Meadow-Schema.js'</span>).new(pJsonSchema, pSchema);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The query for this broker</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _Query = libFoxHound.new(_Fable).setScope(_Scope);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The custom query loader</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _RawQueries = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Meadow-RawQuery.js'</span>).new(_Fable);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The core behaviors.. abstracted into their own modules to encapsulate complexity</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _CreateBehavior = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./behaviors/Meadow-Create.js'</span>);
+		<span class="hljs-keyword">var</span> _ReadBehavior = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./behaviors/Meadow-Read.js'</span>);
+		<span class="hljs-keyword">var</span> _ReadsBehavior = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./behaviors/Meadow-Reads.js'</span>);
+		<span class="hljs-keyword">var</span> _UpdateBehavior = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./behaviors/Meadow-Update.js'</span>);
+		<span class="hljs-keyword">var</span> _DeleteBehavior = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./behaviors/Meadow-Delete.js'</span>);
+		<span class="hljs-keyword">var</span> _CountBehavior = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./behaviors/Meadow-Count.js'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The data provider</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _Provider = <span class="hljs-literal">false</span>;
+		<span class="hljs-keyword">var</span> _ProviderName = <span class="hljs-literal">false</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The default identifier for this broker.
+This is what is used for the automated endpoint queries
+For example the 198 in GET <a href="http://myapi.com/Widget/198">http://myapi.com/Widget/198</a></p>
+<p>Our development model prefers IDWidget as the column name for the default identifier.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _DefaultIdentifier = <span class="hljs-string">'ID'</span>+_Scope;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Load a Meadow Package JSON, create a Meadow object from it.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> _MeadowPackageLoader = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Meadow-PackageLoader.js'</span>);
+		<span class="hljs-keyword">var</span> loadFromPackage = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pPackage</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _MeadowPackageLoader(<span class="hljs-keyword">this</span>, pPackage);
+		};</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setScope</span></p>
+<p>Set the scope</p>
+<p><strong>Returns an Object</strong><br/>(Returns the current Meadow for chaining.)</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setScope = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pScope</span>)
+		</span>{
+			_Scope = pScope;
+			_Query.setScope(pScope);
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+		};</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setIDUser</span></p>
+<p>Set the user ID for inserts and updates</p>
+<p><strong>Returns an Object</strong><br/>(Returns the current Meadow for chaining.)</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setIDUser = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pIDUser</span>)
+		</span>{
+			_IDUser = pIDUser;
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+		};</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setProvider</span></p>
+<p>Set the Provider for Query execution.</p>
+<p>This function expects a string, case sensitive, which matches the
+provider filename</p>
+<p>Parameters:</p>
+<ul>
+<li><strong>pProviderName must be a String.</strong><br/>(The provider for query generation.)</li>
+</ul>
+<p><strong>Returns an Object</strong><br/>(Returns the current Meadow for chaining.)</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setProvider = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pProviderName</span>)
+		</span>{
+			<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span>(pProviderName) !== <span class="hljs-string">'string'</span>)
+			{
+				<span class="hljs-keyword">return</span> setProvider(<span class="hljs-string">'None'</span>);
+			}
+
+			<span class="hljs-keyword">var</span> tmpProviderModuleFile = <span class="hljs-string">'./providers/Meadow-Provider-'</span>+pProviderName+<span class="hljs-string">'.js'</span>;
+
+			<span class="hljs-keyword">try</span>
+			{
+				<span class="hljs-keyword">var</span> tmpProviderModule = <span class="hljs-built_in">require</span>(tmpProviderModuleFile).new(_Fable);
+				_ProviderName = pProviderName;
+				_Provider = tmpProviderModule;
+			}
+			<span class="hljs-keyword">catch</span> (pError)
+			{
+				_Fable.log.error({ProviderModuleFile:tmpProviderModuleFile, InvalidProvider:pProviderName, error:pError}, <span class="hljs-string">'Provider not set - require load problem'</span>);
+				<span class="hljs-comment">//setProvider('None');</span>
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+		};
+		setProvider(_Fable.settings.MeadowProvider);</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setSchema</span></p>
+<p>Set the schema to be something else</p>
+<p><strong>Returns an Object</strong><br/>(This is chainable.)</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setSchema = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pSchema</span>)
+		</span>{
+			_Schema.setSchema(pSchema);
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+		};</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setJsonSchema</span></p>
+<p>Set the Jsonschema to be something else</p>
+<p><strong>Returns an Object</strong><br/>(This is chainable.)</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setJsonSchema = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pJsonSchema</span>)
+		</span>{
+			_Schema.setJsonSchema(pJsonSchema);
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+		};</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setDefault</span></p>
+<p>Set the default object to be something else</p>
+<p><strong>Returns an Object</strong><br/>(This is chainable.)</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setDefault = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pDefault</span>)
+		</span>{
+			_Schema.setDefault(pDefault);
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+		};</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method setDefaultIdentifier</span></p>
+<p>Set the default identifier</p>
+<p><strong>Returns an Object</strong><br/>(This is chainable.)</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> setDefaultIdentifier = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pDefaultIdentifier</span>)
+		</span>{
+			_DefaultIdentifier = pDefaultIdentifier;
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a record</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> doCreate = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallBack</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _CreateBehavior(<span class="hljs-keyword">this</span>, pQuery, fCallBack);
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Read a record</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> doRead = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallBack</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _ReadBehavior(<span class="hljs-keyword">this</span>, pQuery, fCallBack);
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Read multiple records</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> doReads = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallBack</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _ReadsBehavior(<span class="hljs-keyword">this</span>, pQuery, fCallBack);
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Update a record</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> doUpdate = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallBack</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _UpdateBehavior(<span class="hljs-keyword">this</span>, pQuery, fCallBack);
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Delete a record</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> doDelete = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallBack</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _DeleteBehavior(<span class="hljs-keyword">this</span>, pQuery, fCallBack);
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Count multiple records</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> doCount = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pQuery, fCallBack</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _CountBehavior(<span class="hljs-keyword">this</span>, pQuery, fCallBack);
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Take the stored representation of our object and stuff the proper values
+into our record, translating where necessary.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> marshalRecordFromSourceToObject = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">pRecord</span>)
+		</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create an object from the default schema object</p></div></div><div class="code"><div class="wrapper">			<span class="hljs-keyword">var</span> tmpNewObject = libUnderscore.extend({}, _Schema.defaultObject);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Now marshal the values from pRecord into tmpNewObject, based on schema</p></div></div><div class="code"><div class="wrapper">			_Provider.marshalRecordFromSourceToObject(tmpNewObject, pRecord, _Schema.schema);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This turns on magical validation</p></div></div><div class="code"><div class="wrapper">			<span class="hljs-comment">//_Fable.log.trace('Validation', {Value:tmpNewObject, Validation:_Schema.validateObject(tmpNewObject)})</span>
+			<span class="hljs-keyword">return</span> tmpNewObject;
+		};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Container Object for our Factory Pattern</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">var</span> tmpNewMeadowObject = (
+		{
+			doCreate: doCreate,
+			doRead: doRead,
+			doReads: doReads,
+			doUpdate: doUpdate,
+			doDelete: doDelete,
+			doCount: doCount,
+
+			validateObject: _Schema.validateObject,
+			marshalRecordFromSourceToObject: marshalRecordFromSourceToObject,
+
+			setProvider: setProvider,
+			setIDUser: setIDUser,
+
+			loadFromPackage: loadFromPackage,
+			setScope: setScope,
+			setSchema: setSchema,
+			setJsonSchema: setJsonSchema,
+			setDefault: setDefault,
+			setDefaultIdentifier: setDefaultIdentifier,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Factory</p></div></div><div class="code"><div class="wrapper">			<span class="hljs-keyword">new</span>: createNew
+		});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property scope of type <em>string</em></span></p>
+<p>Entity Scope -- usually the name of the entity it represents</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'scope'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _Scope; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property schema of type <em>object</em></span></p>
+<p>Entity Schema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'schema'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _Schema.schema; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property schema of type <em>object</em></span></p>
+<p>Entity Schema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'schemaFull'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _Schema; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property schema of type <em>object</em></span></p>
+<p>Default Identifier</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'defaultIdentifier'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _DefaultIdentifier; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property schema of type <em>object</em></span></p>
+<p>Json Schema</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'jsonSchema'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _Schema.jsonSchema; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property userIdentifier of type <em>string</em></span></p>
+<p>User Identifier</p>
+<p>Used to stamp user identity into Create/Update operations.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'userIdentifier'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _IDUser; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property query of type <em>object</em></span></p>
+<p>Query (FoxHound) object</p>
+<p>This always returns a cloned query, so it&#39;s safe to get queries with a simple:
+  var tmpQuery = libSomeFableObject.query;</p>
+<p>and not expect leakage of basic (cap, begin, filter, dataelements) cloned values.</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'query'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+						</span>{
+							<span class="hljs-keyword">var</span> tmpQuery = _Query.clone();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set the default schema</p></div></div><div class="code"><div class="wrapper">							tmpQuery.query.schema = _Schema.schema;
+							<span class="hljs-keyword">return</span> tmpQuery;
+						},
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property rawQueries of type <em>object</em></span></p>
+<p>Raw Queries</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'rawQueries'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _RawQueries; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property provider of type <em>object</em></span></p>
+<p>Provider</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'provider'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _Provider; },
+				enumerable: <span class="hljs-literal">true</span>
+			});</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Property providerName of type <em>object</em></span></p>
+<p>Provider Name</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-built_in">Object</span>.defineProperty(tmpNewMeadowObject, <span class="hljs-string">'providerName'</span>,
+			{
+				get: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> _ProviderName; },
+				enumerable: <span class="hljs-literal">true</span>
+			});
+
+		_Fable.addServices(tmpNewMeadowObject);
+
+		<span class="hljs-keyword">return</span> tmpNewMeadowObject;
+	}
+
+	<span class="hljs-keyword">return</span> createNew();
+};
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> Meadow();</div></div></div></div></body></html>

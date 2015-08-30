@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="en"><head><title>source/Meadow-RawQuery</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="source/Meadow-RawQuery"><meta name="groc-project-path" content="source/Meadow-RawQuery.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">source/Meadow-RawQuery.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> license MIT and author <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#x73;&#116;&#x65;&#x76;&#101;&#110;&#64;&#x76;&#x65;&#108;&#111;&#122;&#x6f;&#46;&#99;&#x6f;&#109;">&#x73;&#116;&#x65;&#x76;&#101;&#110;&#64;&#x76;&#x65;&#108;&#111;&#122;&#x6f;&#46;&#99;&#x6f;&#109;</a></span></p>
+<h5 id="part-of-the-retold-https-stevenvelozo-github-io-retold-system">Part of the <strong><a href="https://stevenvelozo.github.io/retold/">retold</a></strong> system</h5></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> libFS = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> class MeadowRawQuery</span></p>
+<h3 id="meadow-raw-query-library">Meadow Raw Query Library</h3>
+<p>This library loads and stores raw queries for FoxHound to use.
+You can overload the default query that is built for each of
+the following query archetypes:</p>
+<p><code>Create</code>, <code>Read</code>, <code>Reads</code>, <code>Update</code>, <code>Delete</code>, <code>Count</code></p>
+<p>You can also load other custom queries and give them an
+arbitrary name.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> MeadowRawQuery = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
+</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createNew</span>(<span class="hljs-params">pMeadow</span>)
+	</span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If a valid Fable object isn&#39;t passed in, return a constructor</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">typeof</span>(pMeadow) !== <span class="hljs-string">'object'</span>) || (!pMeadow.hasOwnProperty(<span class="hljs-string">'fable'</span>)))
+		{
+			<span class="hljs-keyword">return</span> {<span class="hljs-keyword">new</span>: createNew};
+		}
+		<span class="hljs-keyword">var</span> _Meadow = pMeadow;
+
+		<span class="hljs-keyword">var</span> _Queries = {};</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method doLoadQuery</span></p>
+<p>Load a Custom Query from a File</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">doLoadQuery</span>(<span class="hljs-params">pQueryTag, pFileName, fCallBack</span>)
+		</span>{
+			<span class="hljs-keyword">var</span> tmpCallBack = (<span class="hljs-keyword">typeof</span>(fCallBack) === <span class="hljs-string">'function'</span>) ? fCallBack : <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{};
+
+			libFS.readFile(pFileName, <span class="hljs-string">'utf8'</span>,
+				<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">pError, pData</span>)
+				</span>{
+					<span class="hljs-keyword">if</span> (pError)
+					{
+						_Meadow.fable.log.error(<span class="hljs-string">'Problem loading custom query file.'</span>, {QueryTag:pQueryTag, FileName:pFileName, <span class="hljs-built_in">Error</span>:pError});</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>There is some debate whether we should leave the queries entry unset or set it to empty so nothing happens.
+If this were to set the query to <code>false</code> instead of <code>&#39;&#39;</code>, FoxHound would be used to generate a query.</p></div></div><div class="code"><div class="wrapper">						doSetQuery(pQueryTag, <span class="hljs-string">''</span>);
+						tmpCallBack(<span class="hljs-literal">false</span>);
+					}
+					<span class="hljs-keyword">else</span>
+					{
+						_Meadow.fable.log.trace(<span class="hljs-string">'Loaded custom query file.'</span>, {QueryTag:pQueryTag, FileName:pFileName});
+						doSetQuery(pQueryTag, pData);
+						tmpCallBack(<span class="hljs-literal">true</span>);
+					}
+				});
+			<span class="hljs-keyword">return</span> _Meadow;
+		}</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method doSetQuery</span></p>
+<p>Sets a Custom Query from a String</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">doSetQuery</span>(<span class="hljs-params">pQueryTag, pQueryString</span>)
+		</span>{
+			_Queries[pQueryTag] = pQueryString;
+			<span class="hljs-keyword">return</span> _Meadow;
+		}</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method doGetQuery</span></p>
+<p>Returns a Custom Query if one has been set for this tag</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">doGetQuery</span>(<span class="hljs-params">pQueryTag</span>)
+		</span>{
+			<span class="hljs-keyword">if</span> (_Queries.hasOwnProperty(pQueryTag))
+			{
+				<span class="hljs-keyword">return</span> _Queries[pQueryTag];
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+		}</div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method doCheckQuery</span></p>
+<p>Check if a Custom Query exists</p></div></div><div class="code"><div class="wrapper">		<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">doCheckQuery</span>(<span class="hljs-params">pQueryTag</span>)
+		</span>{
+			<span class="hljs-keyword">return</span> _Queries.hasOwnProperty(pQueryTag);
+		}
+
+		<span class="hljs-keyword">var</span> tmpNewMeadowRawQuery = (
+		{
+			loadQuery: doLoadQuery,
+			setQuery: doSetQuery,
+
+			checkQuery: doCheckQuery,
+			getQuery: doGetQuery,
+
+			<span class="hljs-keyword">new</span>: createNew
+		});
+
+		<span class="hljs-keyword">return</span> tmpNewMeadowRawQuery;
+	}
+
+	<span class="hljs-keyword">return</span> createNew();
+};
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> MeadowRawQuery();</div></div></div></div></body></html>
