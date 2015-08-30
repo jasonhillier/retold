@@ -17,20 +17,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "projectPath": "README.md",
         "targetPath": "index",
         "pageTitle": "index",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "Meadow",
-            "slug": "meadow",
-            "isFileHeader": true
-          },
-          "depth": 1
-        },
-        "title": "Meadow"
+        "title": "index"
       },
-      "depth": 1,
-      "outline": []
+      "depth": 1
     }, {
       "type": "folder",
       "data": {
@@ -57,8 +46,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "pageTitle": "source/Meadow",
             "title": "Meadow"
           },
-          "depth": 2,
-          "outline": []
+          "depth": 2
         }, {
           "type": "file",
           "data": {
@@ -77,8 +65,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "pageTitle": "source/Meadow-PackageLoader",
             "title": "Meadow-PackageLoader"
           },
-          "depth": 2,
-          "outline": []
+          "depth": 2
         }, {
           "type": "file",
           "data": {
@@ -97,18 +84,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "pageTitle": "source/Meadow-RawQuery",
             "title": "Meadow-RawQuery"
           },
-          "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Meadow Raw Query Library",
-                "slug": "meadow-raw-query-library"
-              },
-              "depth": 3
-            }
-          ]
+          "depth": 2
         }, {
           "type": "file",
           "data": {
@@ -127,34 +103,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "pageTitle": "source/Meadow-Schema",
             "title": "Meadow-Schema"
           },
-          "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 4,
-                "title": "The Meadow Schema",
-                "slug": "the-meadow-schema"
-              },
-              "depth": 4
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 4,
-                "title": "A JSONSchema Description",
-                "slug": "a-jsonschema-description"
-              },
-              "depth": 4
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 4,
-                "title": "An &quot;empty&quot; ORM object",
-                "slug": "an-quotemptyquot-orm-object"
-              },
-              "depth": 4
-            }
-          ]
+          "depth": 2
         }, {
           "type": "folder",
           "data": {
@@ -181,8 +130,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/behaviors/Meadow-Count",
                 "title": "Meadow-Count"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }, {
               "type": "file",
               "data": {
@@ -201,8 +149,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/behaviors/Meadow-Create",
                 "title": "Meadow-Create"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }, {
               "type": "file",
               "data": {
@@ -221,8 +168,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/behaviors/Meadow-Delete",
                 "title": "Meadow-Delete"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }, {
               "type": "file",
               "data": {
@@ -241,8 +187,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/behaviors/Meadow-Read",
                 "title": "Meadow-Read"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }, {
               "type": "file",
               "data": {
@@ -261,8 +206,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/behaviors/Meadow-Reads",
                 "title": "Meadow-Reads"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }, {
               "type": "file",
               "data": {
@@ -281,8 +225,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/behaviors/Meadow-Update",
                 "title": "Meadow-Update"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }
           ]
         }, {
@@ -311,8 +254,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/providers/Meadow-Provider-MySQL",
                 "title": "Meadow-Provider-MySQL"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }, {
               "type": "file",
               "data": {
@@ -331,8 +273,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "pageTitle": "source/providers/Meadow-Provider-None",
                 "title": "Meadow-Provider-None"
               },
-              "depth": 3,
-              "outline": []
+              "depth": 3
             }
           ]
         }
