@@ -1,4 +1,52 @@
-<!DOCTYPE html><html lang="en"><head><title>index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="meadow">Meadow</h1>
+<!DOCTYPE html><html lang="en"><head><title>Overview</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="meadow">Meadow</h1>
 <p>A Javascript Data Broker.</p>
-<p><a href="https://codeclimate.com/github/stevenvelozo/meadow"><img src="https://codeclimate.com/github/stevenvelozo/meadow/badges/gpa.svg" alt="Code Climate"></a> <a href="https://coveralls.io/r/stevenvelozo/meadow?branch=master"><img src="https://coveralls.io/repos/stevenvelozo/meadow/badge.svg?branch=master" alt="Coverage Status"></a> <a href="https://travis-ci.org/stevenvelozo/meadow"><img src="https://travis-ci.org/stevenvelozo/meadow.svg?branch=master" alt="Build Status"></a> <a href="https://david-dm.org/stevenvelozo/meadow"><img src="https://david-dm.org/stevenvelozo/meadow.svg" alt="Dependency Status"></a> <a href="https://david-dm.org/stevenvelozo/meadow#info=devDependencies"><img src="https://david-dm.org/stevenvelozo/meadow/dev-status.svg" alt="devDependency Status"></a></p>
-<p><em>Do not use this yet.</em></p></div></div></div></div></body></html>
+<p><a href="https://codeclimate.com/github/stevenvelozo/meadow"><img src="https://codeclimate.com/github/stevenvelozo/meadow/badges/gpa.svg" alt="Code Climate"></a>
+<a href="https://coveralls.io/r/stevenvelozo/meadow?branch=master"><img src="https://coveralls.io/repos/stevenvelozo/meadow/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="https://travis-ci.org/stevenvelozo/meadow"><img src="https://travis-ci.org/stevenvelozo/meadow.svg?branch=master" alt="Build Status"></a>
+<a href="https://david-dm.org/stevenvelozo/meadow"><img src="https://david-dm.org/stevenvelozo/meadow.svg" alt="Dependency Status"></a>
+<a href="https://david-dm.org/stevenvelozo/meadow#info=devDependencies"><img src="https://david-dm.org/stevenvelozo/meadow/dev-status.svg" alt="devDependency Status"></a></p>
+<p>Who doesn&#39;t love writing the same code over and over again? Good question. Anybody who doesn&#39;t probably wants something to do simple data access stuff. And some of the complicated interactions as well. Meadow aims to provide a simple “magic where you want it, programmability where you don&#39;t” pattern.</p>
+<h2 id="install">Install</h2>
+<pre><code class="lang-sh">$ npm install meadow</code></pre>
+<p>Because meadow requires the <a href="https://github.com/stevenvelozo/fable">fable</a> library, you will also need to install that dependency:</p>
+<pre><code class="lang-sh">$ npm install fable</code></pre>
+<h2 id="quick-start">Quick Start</h2>
+<p>It is pretty easy to perform CRUD access on your database.  And facilities are there to go crazy with custom queries and stored procedures.</p>
+<pre><code class="lang-js"><span class="hljs-comment">// These settings are read automatically from the fable.settings object by meadow</span>
+<span class="hljs-keyword">var</span> databaseSettings = {
+    MySQL:
+        {
+            Server: <span class="hljs-string">"localhost"</span>,
+            Port: <span class="hljs-number">3306</span>,
+            User: <span class="hljs-string">"root"</span>,
+            Password: <span class="hljs-string">""</span>,
+            Database: <span class="hljs-string">"sales_data"</span>,
+            ConnectionPoolLimit: <span class="hljs-number">20</span>
+        }
+};
+
+<span class="hljs-keyword">var</span> fable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fable'</span>).new();
+
+<span class="hljs-comment">// Create a new meadow DAL object for the "Customers" data set</span>
+<span class="hljs-keyword">var</span> meadow = <span class="hljs-built_in">require</span>(<span class="hljs-string">'meadow'</span>).new(fable, <span class="hljs-string">'Customers'</span>)
+        .setProvider(<span class="hljs-string">'MySQL'</span>)
+        .setDefaultIdentifier(<span class="hljs-string">'customerID'</span>);
+
+<span class="hljs-comment">// Construct a query, filtering to a specific customer, number 17</span>
+<span class="hljs-keyword">var</span> queryCustomer = testMeadow.query.addFilter(<span class="hljs-string">'customerID'</span>, <span class="hljs-number">17</span>);
+
+<span class="hljs-comment">// Now pass the read query into the customer DAL, with a callback</span>
+testMeadow.doRead(queryCustomer,
+        <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, query, customer</span>)
+        </span>{
+            <span class="hljs-comment">// The customer parameter will contain a javascript object if there is:</span>
+            <span class="hljs-comment">//   1) a record with customerID = 17</span>
+            <span class="hljs-comment">//   2) in the customers table</span>
+            <span class="hljs-comment">//   3) in the sales_data database</span>
+            <span class="hljs-keyword">if</span> (error)
+            {
+                <span class="hljs-keyword">return</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Error querying customer data: '</span>+error);
+            }
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Found customer ID '</span>+customer.customerID+<span class="hljs-string">' who is named '</span>+customer.name);
+        }
+    );</code></pre></div></div></div></div></body></html>
