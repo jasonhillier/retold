@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="en"><head><title>Overview</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="fable-overview">Fable Overview</h1>
+<p><a href="https://codeclimate.com/github/stevenvelozo/fable"><img src="https://codeclimate.com/github/stevenvelozo/fable/badges/gpa.svg" alt="Code Climate"></a>
+<a href="https://coveralls.io/r/stevenvelozo/fable?branch=master"><img src="https://coveralls.io/repos/stevenvelozo/fable/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="https://travis-ci.org/stevenvelozo/fable"><img src="https://travis-ci.org/stevenvelozo/fable.svg?branch=master" alt="Build Status"></a>
+<a href="https://david-dm.org/stevenvelozo/fable"><img src="https://david-dm.org/stevenvelozo/fable.svg" alt="Dependency Status"></a>
+<a href="https://david-dm.org/stevenvelozo/fable#info=devDependencies"><img src="https://david-dm.org/stevenvelozo/fable/dev-status.svg" alt="devDependency Status"></a></p>
+<p>It is tiring to setup logging and settings management in every application you write. Fable provides a single line solution to have simple logging to the console via <a href="https://github.com/trentm/node-bunyan">bunyan</a>. Add a simple configuration object and it can also write the log to a file. Or even mongodb!</p>
+<h2 id="install">Install</h2>
+<pre><code class="lang-sh">$ npm install fable</code></pre>
+<h2 id="quick-start">Quick Start</h2>
+<p>You can have basic low-level application services in a single line of code.</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> fable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fable'</span>).new();
+
+fable.log.info(<span class="hljs-string">'What are you doing, Dave?'</span>, {SomeColor: <span class="hljs-string">'Red'</span>, CurrentFolder: __dirname });</code></pre>
+<p>Which will output the following to the terminal:</p>
+<pre><code>$ node index.js
+{&quot;name&quot;:&quot;Fable&quot;,&quot;hostname&quot;:&quot;MathBookAir&quot;,&quot;pid&quot;:38807,&quot;level&quot;:30,&quot;Source&quot;:&quot;0x53e0793606800000&quot;,&quot;ver&quot;:&quot;0.0.0&quot;,&quot;datum&quot;:{&quot;SomeColor&quot;:&quot;Red&quot;,&quot;CurrentFolder&quot;:&quot;/Users/steven/FableDemo1&quot;},&quot;msg&quot;:&quot;What are you doing, Dave?&quot;,&quot;time&quot;:&quot;2015-08-31T03:55:02.555Z&quot;,&quot;v&quot;:0}</code></pre>
+<p>From this example, you can learn the following:</p>
+<ul>
+<li>It is pretty simple to start using the library</li>
+<li>The logging output looks really wierd on a standard terminal.</li>
+</ul>
+<h2 id="logging">Logging</h2>
+<p>Fable uses the <a href="https://github.com/trentm/node-bunyan">bunyan</a> logging library.  By default, the log messages all get sent to stdout.</p>
+<p>To make the console log messages prettier, you can install the global bunyan library:</p>
+<pre><code class="lang-sh">nim install -g bunyan</code></pre>
+<p>After which you can send logging output through bunyan, turning this from the quickstart above:</p>
+<pre><code>$ node index.js
+{&quot;name&quot;:&quot;Fable&quot;,&quot;hostname&quot;:&quot;MathBookAir&quot;,&quot;pid&quot;:38807,&quot;level&quot;:30,&quot;Source&quot;:&quot;0x53e0793606800000&quot;,&quot;ver&quot;:&quot;0.0.0&quot;,&quot;datum&quot;:{&quot;SomeColor&quot;:&quot;Red&quot;,&quot;CurrentFolder&quot;:&quot;/Users/steven/FableDemo1&quot;},&quot;msg&quot;:&quot;What are you doing, Dave?&quot;,&quot;time&quot;:&quot;2015-08-31T03:55:02.555Z&quot;,&quot;v&quot;:0}</code></pre>
+<p>Into something more readable:</p>
+<pre><code>$ node index.js |bunyan
+[2015-08-31T04:06:10.230Z]  INFO: Fable/38992 on MathBookAir: What are you doing, Dave? (Source=0x53e07bc20d400000, ver=0.0.0)
+    datum: {
+      &quot;SomeColor&quot;: &quot;Red&quot;,
+      &quot;CurrentFolder&quot;: &quot;/Users/steven/FableDemo1&quot;
+    }</code></pre>
+<p>If you want logging to go to a file, you can do that too.  Just configure the <code>LogStreams</code> array in the settings object like so:</p>
+<pre><code>{
+    &quot;Product&quot;: &quot;MyApplicationNameHere&quot;,
+    &quot;ProductVersion&quot;: &quot;2.1.8&quot;,
+
+    &quot;UUID&quot;:
+        {
+            &quot;DataCenter&quot;: 0,
+            &quot;Worker&quot;: 0
+        },
+    &quot;LogStreams&quot;:
+        [
+            {
+                &quot;level&quot;: &quot;trace&quot;,
+                &quot;path&quot;: &quot;./Logs/MyFavoriteLogFile.log&quot;
+            }
+        ]
+}</code></pre>
+<p>As long as the <code>./Logs</code> folder exists, Bunyan will write to this log file instead.</p>
+<p>We can stream log entries from a certain level or higher (e.g. in the previous example we are writing <code>trace</code> and higher log lines to the file).  You can then have a text log on rotation per application server, and a centralized mongodb log for the whole farm.</p>
+<p>There are three log stream types supported:</p>
+<ul>
+<li>console</li>
+<li>text file</li>
+<li>mongodb</li>
+</ul>
+<p>Below is a JSON configuration example containing all of the three log stream types supported:</p>
+<pre><code>{
+    &quot;Product&quot;: &quot;MyApplicationNameHere&quot;,
+    &quot;ProductVersion&quot;: &quot;2.1.8&quot;,
+
+    &quot;UUID&quot;:
+        {
+            &quot;DataCenter&quot;: 0,
+            &quot;Worker&quot;: 0
+        },
+    &quot;LogStreams&quot;:
+        [
+            {
+                &quot;level&quot;: &quot;trace&quot;,
+                &quot;path&quot;: &quot;./Logs/Application.log&quot;
+            },
+            {
+                &quot;level&quot;: &quot;trace&quot;,
+                &quot;streamtype&quot;: &quot;process.stdout&quot;
+            },
+            {
+                &quot;level&quot;: &quot;info&quot;,
+                &quot;streamtype&quot;: &quot;mongodb&quot;
+            }
+        ]
+}</code></pre>
+<h3 id="-fableloginfomessage-rawobject">_Fable.log.info(message, rawObject)</h3>
+<p>Writes a log message to the <code>info</code> log level.  All <a href="https://github.com/trentm/node-bunyan">bunyan</a> log levels are supported, as the log object here is just a reference to bunyan.</p>
+<p>This means you can also use the following log levels (taken from the bunyan documentation):</p>
+<ul>
+<li><code>fatal</code> (60): The service/app is going to stop or become unusable now. An operator should definitely look into this soon.</li>
+<li><code>error</code> (50): Fatal for a particular request, but the service/app continues servicing other requests. An operator should look at this soon(ish).</li>
+<li><code>warn</code> (40): A note on something that should probably be looked at by an operator eventually.</li>
+<li><code>info</code> (30): Detail on regular operation.</li>
+<li><code>debug</code> (20): Anything else, i.e. too verbose to be included in &quot;info&quot; level.</li>
+<li><code>trace</code> (10): Logging from external libraries used by your app or very detailed application logging.</li>
+</ul>
+<p>Fun note -- if you use a <code>_Fable.log.fatal(&#39;Oh my gosh cats are everywhere!&#39;)</code> call to the <code>fatal</code> stream, the bunyon console logger will invert the text by the log entry making it easier to see.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>message</code> - A string message for the log entry text</li>
+<li><code>rawObject</code> - A javascript object containing anything else you want logged</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code class="lang-js">fable.log.info(<span class="hljs-string">'What are you doing, Dave?'</span>, {SomeColor: <span class="hljs-string">'Red'</span>, CurrentFolder: __dirname });
+<span class="hljs-comment">// This just wrote out a nice log line to wherever you have your log streams pointing to</span></code></pre>
+<hr>
+<h2 id="application-settings">Application Settings</h2>
+<p>The excellent white paper <a href="http://shaffner.us/cs/papers/tarpit.pdf">Out of the Tar Pit</a> describes a critical problem with how we manage state in most large-scale application designs.  One of the fronts we use to combat this state management issue is by separating the non-business state of the application out.  The easiest example of this is the address list for other servers in your data center.  We certainly need to know the address of the database server, but this address has nothing to do with how many widgets are in stock for your site visitors to purchase.</p>
+<p>Therefore we provide a configuration management system in Fable.  You can load thse configurations from files, pass them in or modify them in real-time.</p>
+<p>These configuration settings are meant to be just the state your application needs to run in its environment and as configured.</p>
+<p>You can pass settings into fable in the constructor:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> _Fable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fable'</span>).new({Product: <span class="hljs-string">'MyProduct'</span>, ProductVersion: <span class="hljs-string">'1.3.8'</span>});
+
+<span class="hljs-comment">// Fill in other settings</span>
+_Fable.settingsManager.fill({ApacheStormAddress: <span class="hljs-string">'192.168.167.100'</span>});
+
+<span class="hljs-comment">// Now access a setting</span>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Apache Storm is located at: "</span>+_Fable.settings.ApacheStormAddress);
+
+<span class="hljs-comment">// ...printing out "Apache Storm is located at: 192.168.167.100" to the console</span></code></pre>
+<h3 id="-fablesettings">_Fable.settings</h3>
+<p>Access to the settings values which have been set.  Fable comes with a number of default settings:</p>
+<pre><code class="lang-js">    <span class="hljs-comment">// Default Fable settings</span>
+    <span class="hljs-keyword">var</span> _SettingsDefaults = (
+    {
+        <span class="hljs-comment">// This is used for logging and API identification</span>
+        Product: <span class="hljs-string">'Fable'</span>,
+        ProductVersion: <span class="hljs-string">'0.0.0'</span>,
+
+        <span class="hljs-comment">// The default port for an API server</span>
+        APIServerPort: <span class="hljs-number">8080</span>,
+
+        <span class="hljs-comment">// The location for a config file to load</span>
+        ConfigFile: <span class="hljs-literal">false</span>,
+
+        <span class="hljs-comment">// Identification for the log and record GUID generators</span>
+        UUID: (
+            {
+                DataCenter: <span class="hljs-number">0</span>,
+                Worker: <span class="hljs-number">0</span>
+            }),
+
+        <span class="hljs-comment">// The session handler configuration</span>
+        SessionStrategy: <span class="hljs-string">"memcached"</span>,
+        MemcachedURL: <span class="hljs-string">"127.0.0.1:11211"</span>,
+
+        <span class="hljs-comment">// The MongoDB URL (this is used by the logger)</span>
+        MongoDBURL:<span class="hljs-string">"mongodb://127.0.0.1/Fable"</span>,
+
+        <span class="hljs-comment">// The MySQL Server connection data</span>
+        MySQL:
+            {
+                <span class="hljs-string">"Server"</span>: <span class="hljs-string">"127.0.0.1"</span>,
+                <span class="hljs-string">"Port"</span>: <span class="hljs-number">3306</span>,
+                <span class="hljs-string">"User"</span>: <span class="hljs-string">"ENTER_USER_HERE"</span>,
+                <span class="hljs-string">"Password"</span>: <span class="hljs-string">"ENTER_PASSWORD_HERE"</span>,
+                <span class="hljs-string">"Database"</span>: <span class="hljs-string">"ENTER_DATABASE_HERE"</span>,
+                <span class="hljs-string">"ConnectionPoolLimit"</span>: <span class="hljs-number">20</span>
+            },
+
+        <span class="hljs-comment">// A sane default log stream</span>
+        LogStreams: [{streamtype:<span class="hljs-string">'process.stdout'</span>, level:<span class="hljs-string">'trace'</span>}]
+    });</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="lang-js"><span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Wiring up routes for "</span>+_Fable.settings.Product);
+
+<span class="hljs-comment">// Which writes "Wiring up routes for WHATEVER_VALUE_YOU_PUT_IN_THE_PRODUCT_SETTING"</span></code></pre>
+<h3 id="-fablenewsettingsobject">_Fable.new(settingsObject)</h3>
+<p>Constructs the fable object and sets the <em>default settings</em> to whatever is passed in as <code>settingsObject</code>.  Fable allows you to create clones by calling <code>Fable.new()</code> from any fable object, and these clones will use the same default settings as passed in with the first construction.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>settingsObject</code> - An object to use as the default settings</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> _Fable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fable'</span>).new({Product: <span class="hljs-string">'MyCoolProduct'</span>, ProductVersion: <span class="hljs-string">'1.13.8'</span>});
+<span class="hljs-comment">// _Fable is now ready to use.</span></code></pre>
+<h3 id="-fablesettingsmanagerfillsettingsobject">_Fable.settingsManager.fill(settingsObject)</h3>
+<p>Fills in values in the settings object without overwriting values already there.  This is especially useful for maintaining libraries that rely on fable.  You can <code>fill</code> any required settings to default values after your library has been instantiated.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>settingsObject</code> - An object to fill in settings with</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code class="lang-js"><span class="hljs-comment">// Assuming the _Fable has already been initialized</span>
+_Fable.settingsManager.fill({MaximumThumbnailCacheSize: <span class="hljs-number">50</span>});
+
+<span class="hljs-comment">// If MaximumThumbnailCacheSize was not set, it is now!</span></code></pre>
+<h3 id="-fablesettingsmanagermergesettingsobject">_Fable.settingsManager.merge(settingsObject)</h3>
+<p>Merge in values to settings, destructively overwriting previous values if they were already there.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>settingsObject</code> - An object to merge into settings</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code class="lang-js"><span class="hljs-comment">// Assuming the _Fable has already been initialized</span>
+_Fable.settingsManager.merge({RequestTimeout: <span class="hljs-number">1500</span>});
+
+<span class="hljs-comment">// Regardless of whether RequestTimeout was set before merge, it is now 1500</span></code></pre>
+<hr>
+<h2 id="universally-unique-identifiers">Universally Unique Identifiers</h2>
+<p>When instantiating fable, you can define a couple configuration values which will help generate UUIDs with some encoded information.  This includes the DataCenter and Worker portions of the settings object.  These two values are then deconstructible from the UUIDs generated using the following code:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> fable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fable'</span>).new();
+
+<span class="hljs-keyword">var</span> uuid = fable.getUUID();
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'My UUID is: '</span>+uuid);</code></pre>
+<p>Resulting in:</p>
+<pre><code>steven at MathBookPro in ~/FableTest
+$ node index.js
+My UUID is: 0x53e122bc8f400000
+steven at MathBookPro in ~/FableTest
+$ node index.js
+My UUID is: 0x53e122c213800000</code></pre>
+<h3 id="-fablegetuuid">_Fable.getUUID()</h3>
+<p>Return a unique identifier, with encoded information about the data center and worker portion of the configuration file.</p>
+<p><strong>Example</strong></p>
+<pre><code class="lang-js"><span class="hljs-comment">// Assuming the _Fable has already been initialized</span>
+<span class="hljs-keyword">var</span> uuid = fable.getUUID();
+
+<span class="hljs-comment">// The uuid variable now contains a unique string.</span></code></pre></div></div></div></div></body></html>
