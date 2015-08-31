@@ -33,10 +33,10 @@
         .setDefaultIdentifier(<span class="hljs-string">'customerID'</span>);
 
 <span class="hljs-comment">// Construct a query, filtering to a specific customer, number 17</span>
-<span class="hljs-keyword">var</span> queryCustomer = testMeadow.query.addFilter(<span class="hljs-string">'customerID'</span>, <span class="hljs-number">17</span>);
+<span class="hljs-keyword">var</span> queryDescription = meadow.query.addFilter(<span class="hljs-string">'customerID'</span>, <span class="hljs-number">17</span>);
 
 <span class="hljs-comment">// Now pass the read query into the customer DAL, with a callback</span>
-testMeadow.doRead(queryCustomer,
+meadow.doRead(queryDescription,
         <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error, query, customer</span>)
         </span>{
             <span class="hljs-comment">// The customer parameter will contain a javascript object if there is:</span>
